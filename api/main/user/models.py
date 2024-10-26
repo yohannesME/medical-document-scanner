@@ -40,7 +40,8 @@ class User:
     access_token = request.headers.get("AccessToken")
     refresh_token = request.headers.get("RefreshToken")
 
-    resp = tools.JsonResp({ "message": "User not logged in" }, 401)
+    if not access_token or not refresh_token:
+      resp = tools.JsonResp({ "message": "User not logged in" }, 401)
 
     if access_token:
       try:
@@ -60,11 +61,12 @@ class User:
       email = data["email"].lower()
       user = app.db.users.find_one({ "email": email }, { "_id": 0 })
 
+
       if user and pbkdf2_sha256.verify(data["password"], user["password"]):
         access_token = auth.encodeAccessToken(user["id"], user["email"], user["plan"])
         refresh_token = auth.encodeRefreshToken(user["id"], user["email"], user["plan"])
 
-        app.db.users.update({ "id": user["id"] }, { "$set": {
+        app.db.users.update_one({ "id": user["id"] }, { "$set": {
           "refresh_token": refresh_token,
           "last_login": tools.nowDatetimeUTC()
         } })

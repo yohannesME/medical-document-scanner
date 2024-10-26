@@ -22,6 +22,6 @@ def login():
 def logout():
 	return User().logout()
 
-@user_blueprint.route("/", methods=["POST"])
+@user_blueprint.route("/register", methods=["POST"])
 def add():
-	return User().add()
+	return User().add();
