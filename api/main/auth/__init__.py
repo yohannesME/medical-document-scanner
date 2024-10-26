@@ -9,7 +9,13 @@ import datetime
 def token_required(f):
 	@wraps(f)
 	def decorated(*args, **kwargs):
-		access_token = request.headers.get('AccessToken')
+		# get the token from the bearer function
+		access_token = request.headers.get('Authorization')
+		# access_token = request.headers.get('AccessToken')
+
+
+		if access_token:
+			access_token = access_token.split(" ")[1]
 
 		try:
 			data = jwt.decode(access_token, app.config['SECRET_KEY'])

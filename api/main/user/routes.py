@@ -19,6 +19,7 @@ def login():
 	return User().login()
 
 @user_blueprint.route("/logout/", methods=["GET"])
+@token_required
 def logout():
 	return User().logout()
 
