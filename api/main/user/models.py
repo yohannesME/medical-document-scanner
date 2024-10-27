@@ -133,8 +133,8 @@ class User:
       if app.db.users.insert_one(user):
         
         # Log the user in (create and return tokens)
-        access_token = auth.encodeAccessToken(user["id"], user["email"], user["plan"])
-        refresh_token = auth.encodeRefreshToken(user["id"], user["email"], user["plan"])
+        access_token = auth.encodeAccessToken(user["id"], user["email"])
+        refresh_token = auth.encodeRefreshToken(user["id"], user["email"])
 
         app.db.users.update_one ({ "id": user["id"] }, {
           "$set": {

@@ -27,23 +27,21 @@ def token_required(f):
 
 	return decorated
 
-def encodeAccessToken(user_id, email, plan):
+def encodeAccessToken(user_id, email):
 
 	accessToken = jwt.encode({
 		"user_id": user_id,
 		"email": email,
-		"plan": plan,
 		"exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=15) # The token will expire in 15 minutes
 	}, app.config["SECRET_KEY"], algorithm="HS256")
 
 	return accessToken
 
-def encodeRefreshToken(user_id, email, plan):
+def encodeRefreshToken(user_id, email):
 
 	refreshToken = jwt.encode({
 		"user_id": user_id,
 		"email": email,
-		"plan": plan,
 		"exp": datetime.datetime.utcnow() + datetime.timedelta(weeks=4) # The token will expire in 4 weeks
 	}, app.config["SECRET_KEY"], algorithm="HS256")
 
