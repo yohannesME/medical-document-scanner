@@ -54,7 +54,6 @@ class User:
     return resp
 
   def login(self):
-    resp = tools.JsonResp({ "message": "Invalid user credentials" }, 403)
     
     try:
       data = json.loads(request.data)
@@ -63,8 +62,8 @@ class User:
 
 
       if user and pbkdf2_sha256.verify(data["password"], user["password"]):
-        access_token = auth.encodeAccessToken(user["id"], user["email"], user["plan"])
-        refresh_token = auth.encodeRefreshToken(user["id"], user["email"], user["plan"])
+        access_token = auth.encodeAccessToken(user["id"], user["email"])
+        refresh_token = auth.encodeRefreshToken(user["id"], user["email"])
 
         app.db.users.update_one({ "id": user["id"] }, { "$set": {
           "refresh_token": refresh_token,
@@ -79,9 +78,11 @@ class User:
           "access_token": access_token,
           "refresh_token": refresh_token
         }, 200)
+
+        print(resp)
       
     except Exception:
-      pass
+      resp = tools.JsonResp({ "message": "Invalid user credentials" }, 403)
     
     return resp
   
@@ -147,6 +148,7 @@ class User:
           "email": user["email"],
           "first_name": user["first_name"],
           "last_name": user["last_name"],
+          "organization": user["organization"],
           "access_token": access_token,
           "refresh_token": refresh_token
         }, 200)
