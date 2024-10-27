@@ -7,6 +7,7 @@ import os
 
 # Import Routes
 from main.user.routes import user_blueprint
+from main.admin.routes import admin_blueprint
 
 def create_app():
 
@@ -29,6 +30,7 @@ def create_app():
 
   # Register Blueprints
   app.register_blueprint(user_blueprint, url_prefix="/user")
+  app.register_blueprint(admin_blueprint, url_prefix="/admin")
 
   # Index Route
   @app.route("/")

@@ -18,7 +18,7 @@ class User:
       "first_name": "",
       "last_name": "",
       "email": "",
-      "plan": "basic"
+      "is_admin": False
     }
   
   def get(self):
@@ -76,7 +76,6 @@ class User:
           "email": user["email"],
           "first_name": user["first_name"],
           "last_name": user["last_name"],
-          "plan": user["plan"],
           "access_token": access_token,
           "refresh_token": refresh_token
         }, 200)
@@ -99,14 +98,16 @@ class User:
 
     return resp
   
-  def add(self):
+  def register(self):
     data = json.loads(request.data)
 
     expected_data = {
       "first_name": data['first_name'],
       "last_name": data['last_name'],
       "email": data['email'].lower(),
-      "password": data['password']
+      "password": data['password'],
+      "organization" : data['organization']
+
     }
 
     # Merge the posted data with the default user attributes
@@ -146,7 +147,6 @@ class User:
           "email": user["email"],
           "first_name": user["first_name"],
           "last_name": user["last_name"],
-          "plan": user["plan"],
           "access_token": access_token,
           "refresh_token": refresh_token
         }, 200)
