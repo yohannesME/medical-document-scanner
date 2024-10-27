@@ -30,8 +30,28 @@ class Admin:
         resp = tools.JsonResp(responseData, 200)
         return resp
     
-    #
+    # activate and deactivate a user
+    def activateUser(self):
+        # get the user Id to activate
+        data = json.loads(request.data)
+        userId = data["user_id"]
 
+        # activate the user
+        app.db.users.update_one({ "id": userId }, { "$set": { "acct_active": True } })
+
+        resp = tools.JsonResp({ "message": "User activated" }, 200)
+        return resp
+    
+    def deactivateUser(self):
+        # get the user Id to deactivate
+        data = json.loads(request.data)
+        userId = data["user_id"]
+
+        # deactivate the user
+        app.db.users.update_one({ "id": userId }, { "$set": { "acct_active": False } })
+
+        resp = tools.JsonResp({ "message": "User deactivated" }, 200)
+        return resp
 
 
 
