@@ -12,6 +12,8 @@ pymongo = "*"
 python-jose = "*"
 passlib = "*"
 pytz = "*"
+openai = "1.52.2"
+Pillow = "*"
 
 [requires]
 python_version = ""
