@@ -69,3 +69,13 @@ class ExtractImage:
             return tools.JsonResp(json.loads(extracted_data), 200)
         else:
             return tools.JsonResp({ "message": "Failed to optimize the image." }, 500)
+    
+    def get_patient_data(self, patient_id):
+        try:
+            extracted_data = extractImage.get_patient_data(patient_id)
+            return tools.JsonResp(extracted_data, 200)
+        except Exception as e:
+            return tools.JsonResp({ "message": "Failed to get patient data" }, 500)
+    
+    # search for patient data by their name, email, or phone number 
+    
