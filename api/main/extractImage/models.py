@@ -51,6 +51,7 @@ class ExtractImage:
             base64_image = extractImage.encode_image(optimized_image_path)
 
             # Step 3: Extract data from the medical record using OpenAI API
+            # extracted_data = extractImage.extract_medical_record_data(base64_image)
             try:
                 extracted_data = extractImage.extract_medical_record_data(base64_image)
                 access_token = request.headers.get('AccessToken')
