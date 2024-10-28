@@ -50,27 +50,31 @@ def extract_medical_record_data(base64_image):
     system_prompt = f"""
     You are an OCR-like data extraction tool that extracts medical record data from images.
 
-    1. Please extract the data in this medical record, grouping data according to theme/subgroups, and then output into JSON.
+    Extract the information from the image and structure it into a JSON format as follows:
 
-    2. Please keep the keys and values of the JSON in the original language.
+    PatientDemographics:
 
-    3. The type of data you might encounter in the medical record includes but is not limited to: patient information, medical history, diagnoses, medications, lab results, vital signs, treatment plans, and doctor's notes.
+    MedicalRecordNumber: Unique identifier for the patient’s medical record.
+    DateOfRegistration: Date the patient registered (YYYY-MM-DD format).
+    Name: Full name of the patient.
+    FatherName: Name of the patient's father.
+    GrandFatherName: Name of the patient's grandfather.
+    Gender: Patient’s gender (Male/Female).
+    Age: Patient’s age.
+    Address:
+    Region: The region where the patient resides.
+    Wereda: Sub-city or district of residence.
+    HouseNumber: House number.
+    Kebele: Local administrative unit or kebele.
+    PhoneNumber: Patient’s contact number.
+    HistorySheet (an array with multiple entries if available):
 
-    4. If the page contains no relevant data, please output an empty JSON object and don't make up any data.
-
-    5. If there are blank data fields in the medical record, please include them as "null" values in the JSON object.
-
-    6. If there are tables in the medical record, capture all of the rows and columns in the JSON object.
-       Even if a column is blank, include it as a key in the JSON object with a null value.
-
-    7. If a row is blank, denote missing fields with "null" values.
-
-    8. Don't interpolate or make up data.
-
-    9. Please maintain the table structure of any data tables, i.e., capture all of the rows and columns in the JSON object.
-
-    10. Ensure that all extracted data complies with privacy regulations and handle any personal identifiable information (PII) appropriately.
-
+    Date: Date of each medical record entry (YYYY-MM-DD format).
+    NameOfPatient: Full name of the patient.
+    Age: Patient’s age.
+    Sex: Patient’s gender (Male/Female).
+    MedicalRecordNumber: The patient's unique medical record identifier.
+    MedicalHistory: Summary of the patient's medical history on that date.
     """
 
     response = openai.chat.completions.create(
