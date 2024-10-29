@@ -22,19 +22,22 @@ class User:
     }
   
   def get(self):
-    token_data = jwt.decode(request.headers.get('AccessToken'), app.config['SECRET_KEY'])
+    try:
+      token_data = jwt.decode(request.headers.get('AccessToken'), app.config['SECRET_KEY'])
 
-    user = app.db.users.find_one({ "id": token_data['user_id'] }, {
-      "_id": 0,
-      "password": 0
-    })
+      user = app.db.users.find_one({ "id": token_data['user_id'] }, {
+        "_id": 0,
+        "password": 0
+      })
 
-    if user:
-      resp = tools.JsonResp(user, 200)
-    else:
-      resp = tools.JsonResp({ "message": "User not found" }, 404)
+      if user:
+        resp = tools.JsonResp(user, 200)
+      else:
+        resp = tools.JsonResp({ "message": "User not found" }, 404)
 
-    return resp
+      return resp
+    except Exception as e:
+      return tools.JsonResp({ "message": "Invalid Request" }, 500)
   
   def getAuth(self):
     access_token = request.headers.get("AccessToken")
@@ -56,7 +59,6 @@ class User:
     return resp
 
   def login(self):
-    
     resp = tools.JsonResp({ "message": "Invalid Credentials" }, 401)
     
     try:
@@ -84,8 +86,6 @@ class User:
           "refresh_token": refresh_token
         }, 200)
 
-        print(resp)
-      
     except Exception:
       resp = tools.JsonResp({ "message": "Invalid user credentials" }, 403)
     
@@ -105,60 +105,63 @@ class User:
     return resp
   
   def register(self):
-    data = json.loads(request.data)
+    try:
+      data = json.loads(request.data)
 
-    expected_data = {
-      "first_name": data['first_name'],
-      "last_name": data['last_name'],
-      "email": data['email'].lower(),
-      "password": data['password'],
-      "organization" : data['organization']
+      expected_data = {
+        "first_name": data['first_name'],
+        "last_name": data['last_name'],
+        "email": data['email'].lower(),
+        "password": data['password'],
+        "organization" : data['organization']
 
-    }
+      }
 
-    # Merge the posted data with the default user attributes
-    self.defaults.update(expected_data)
-    user = self.defaults
-    
-    # Encrypt the password
-    user["password"] = pbkdf2_sha256.encrypt(user["password"], rounds=20000, salt_size=16)
+      # Merge the posted data with the default user attributes
+      self.defaults.update(expected_data)
+      user = self.defaults
+      
+      # Encrypt the password
+      user["password"] = pbkdf2_sha256.encrypt(user["password"], rounds=20000, salt_size=16)
 
-    # Make sure there isn"t already a user with this email address
-    existing_email = app.db.users.find_one({ "email": user["email"] })
+      # Make sure there isn"t already a user with this email address
+      existing_email = app.db.users.find_one({ "email": user["email"] })
 
 
-    if existing_email:
-      resp = tools.JsonResp({
-        "message": "There's already an account with this email address",
-        "error": "email_exists"
-      }, 400)
-    
-    else:
-      # save to the database
-
-      if app.db.users.insert_one(user):
-        
-        # Log the user in (create and return tokens)
-        access_token = auth.encodeAccessToken(user["id"], user["email"])
-        refresh_token = auth.encodeRefreshToken(user["id"], user["email"])
-
-        app.db.users.update_one ({ "id": user["id"] }, {
-          "$set": {
-            "refresh_token": refresh_token
-          }
-        })
-        
+      if existing_email:
         resp = tools.JsonResp({
-          "id": user["id"],
-          "email": user["email"],
-          "first_name": user["first_name"],
-          "last_name": user["last_name"],
-          "organization": user["organization"],
-          "access_token": access_token,
-          "refresh_token": refresh_token
-        }, 200)
-
+          "message": "There's already an account with this email address",
+          "error": "email_exists"
+        }, 400)
+      
       else:
-        resp = tools.JsonResp({ "message": "User could not be added" }, 400)
+        # save to the database
 
-    return resp
+        if app.db.users.insert_one(user):
+          
+          # Log the user in (create and return tokens)
+          access_token = auth.encodeAccessToken(user["id"], user["email"])
+          refresh_token = auth.encodeRefreshToken(user["id"], user["email"])
+
+          app.db.users.update_one ({ "id": user["id"] }, {
+            "$set": {
+              "refresh_token": refresh_token
+            }
+          })
+          
+          resp = tools.JsonResp({
+            "id": user["id"],
+            "email": user["email"],
+            "first_name": user["first_name"],
+            "last_name": user["last_name"],
+            "organization": user["organization"],
+            "access_token": access_token,
+            "refresh_token": refresh_token
+          }, 200)
+
+        else:
+          resp = tools.JsonResp({ "message": "User could not be added" }, 400)
+
+      return resp
+    except Exception as e:
+      return tools.JsonResp({ "message": "Invalid Request" }, 500)
