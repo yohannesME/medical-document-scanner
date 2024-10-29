@@ -34,6 +34,8 @@ def store_image_data_db(extracted_data, user):
     extracted_data["user_id"] = user["id"]
     if "organization" in user:
         extracted_data["organization"] = user["organization"]
+    if "_id" in user:
+        extracted_data["user_id"] = user["_id"]
 
     app.db.medical_records.insert_one(extracted_data)
     return extracted_data

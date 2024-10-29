@@ -6,7 +6,19 @@ import json
 from jose import jwt
 
 class ExtractImage:
-    
+    def get_user_from_token(self):
+        # get the user access token
+        access_token = request.headers.get('AccessToken')
+
+        token_data = jwt.decode(access_token, app.config['SECRET_KEY'])
+
+        user = app.db.users.find_one({ "id": token_data['user_id'] }, {
+            "_id": 0,
+            "password": 0
+        })
+
+        return user
+
     def upload_image(self):
         try: 
             if 'image' not in request.files:
@@ -58,14 +70,7 @@ class ExtractImage:
                 # extracted_data = extractImage.extract_medical_record_data(base64_image)
                 try:
                     extracted_data = extractImage.extract_medical_record_data(base64_image)
-                    access_token = request.headers.get('AccessToken')
-
-                    token_data = jwt.decode(access_token, app.config['SECRET_KEY'])
-                    user = app.db.users.find_one({ "id": token_data['user_id'] }, {
-                        "_id": 0,
-                        "password": 0
-                    })
-
+                    user = self.get_user_from_token()
                     extractImage.store_image_data_db(extracted_data, user)
                 except Exception as e:
                     return tools.JsonResp({ "message": "Failed to extract data" }, 500)
@@ -99,8 +104,15 @@ class ExtractImage:
 
     def patient_data(self):
         try:
-            # get all the patient data from the database
-            patient_data = app.db.medical_records.find()
+            # get the user access token
+            user = self.get_user_from_token()
+            if user.get("is_admin") is False:
+                if user.get("organization") is None:
+                    return tools.JsonResp({ "message": "No Records" }, 401)
+                patient_data = app.db.medical_records.find({"organization" : user["organization"]})
+            else:
+                # get all the patient data from the database
+                patient_data = app.db.medical_records.find()
             patient_data = list(patient_data)
 
             return tools.JsonResp({"data" : patient_data, "count": len(patient_data)}, 200)
