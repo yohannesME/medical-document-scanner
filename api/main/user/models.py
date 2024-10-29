@@ -40,8 +40,7 @@ class User:
     access_token = request.headers.get("AccessToken")
     refresh_token = request.headers.get("RefreshToken")
 
-    if not access_token or not refresh_token:
-      resp = tools.JsonResp({ "message": "User not logged in" }, 401)
+    resp = tools.JsonResp({ "message": "User not logged in" }, 401)
 
     if access_token:
       try:
@@ -51,14 +50,20 @@ class User:
         # If the access_token has expired, get a new access_token - so long as the refresh_token hasn't expired yet
         resp = auth.refreshAccessToken(refresh_token)
 
+    elif refresh_token:
+      resp = auth.refreshAccessToken(refresh_token)
+
     return resp
 
   def login(self):
+    
+    resp = tools.JsonResp({ "message": "Invalid Credentials" }, 401)
     
     try:
       data = json.loads(request.data)
       email = data["email"].lower()
       user = app.db.users.find_one({ "email": email }, { "_id": 0 })
+      
 
 
       if user and pbkdf2_sha256.verify(data["password"], user["password"]):
