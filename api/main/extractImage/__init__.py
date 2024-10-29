@@ -63,11 +63,13 @@ def extract_medical_record_data(base64_image):
     Gender: Patient’s gender (Male/Female).
     Age: Patient’s age.
     Address:
-    Region: The region where the patient resides.
+    Region: The region where the patient resides. 
     Wereda: Sub-city or district of residence.
     HouseNumber: House number.
     Kebele: Local administrative unit or kebele.
     PhoneNumber: Patient’s contact number.
+
+
     HistorySheet (an array with multiple entries if available):
 
     Date: Date of each medical record entry (YYYY-MM-DD format).
@@ -111,7 +113,7 @@ def search_patient_data(search_term):
     query = {
         "$or": [
             {"PatientDemographics.Name": {"$regex": search_term, "$options": "i"}},
-            {"PatientDemographics.Address.PhoneNumber" : {"$regex" : search_term, "$options": "i" }},
+            {"PatientDemographics.PhoneNumber" : {"$regex" : search_term, "$options": "i" }},
             {"PatientDemographics.MedicalRecordNumber": {"$regex": search_term, "$options": "i"}},
             {"HistorySheet.MedicalHistory": {"$regex": search_term, "$options": "i"}}
         ]

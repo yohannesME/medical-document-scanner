@@ -79,6 +79,9 @@ class ExtractImage:
     def get_patient_data(self, patient_id):
         try:
             extracted_data = extractImage.get_patient_data(patient_id)
+
+            if extracted_data is None:
+                return tools.JsonResp({ "message": "Patient data not found." }, 500)
             return tools.JsonResp(extracted_data, 200)
         except Exception as e:
             return tools.JsonResp({ "message": "Failed to get patient data" }, 500)
