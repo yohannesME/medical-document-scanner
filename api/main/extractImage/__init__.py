@@ -106,4 +106,21 @@ def extract_medical_record_data(base64_image):
 def get_patient_data(patient_id):
     data = app.db.medical_records.find_one({"_id": ObjectId(patient_id)})
     return data
+
+def search_patient_data(search_term):
+    query = {
+        "$or": [
+            {"PatientDemographics.Name": {"$regex": search_term, "$options": "i"}},
+            {"PatientDemographics.Address.PhoneNumber" : {"$regex" : search_term, "$options": "i" }},
+            {"PatientDemographics.MedicalRecordNumber": {"$regex": search_term, "$options": "i"}},
+            {"HistorySheet.MedicalHistory": {"$regex": search_term, "$options": "i"}}
+        ]
+    }
+
+    # Execute the query
+    results = list(app.db.medical_records.find(query, {"_id": 0}))  # Omit _id in results
+
+    print(results) 
+
+    return results
     

@@ -20,3 +20,15 @@ def extract_data_api():
 @token_required
 def get_patient_data(patient_id):
 	return ExtractImage().get_patient_data(patient_id)
+
+
+@extract_blueprint.route("/search_patient_data", methods=["GET"])
+@token_required
+def search_patient_data():
+	return ExtractImage().search_patient_data()
+
+
+@extract_blueprint.route("/patient_data", methods=["GET"])
+@token_required
+def patient_data():
+	return ExtractImage().patient_data()

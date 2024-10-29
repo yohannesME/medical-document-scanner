@@ -77,5 +77,23 @@ class ExtractImage:
         except Exception as e:
             return tools.JsonResp({ "message": "Failed to get patient data" }, 500)
     
-    # search for patient data by their name, email, or phone number 
+    # search for patient data by their name, email or phone number 
+    def search_patient_data(self):
+        try:
+            # extract the body from the request
+            data = json.loads(request.data)
+            search_term = data["query"]
+            extracted_data = extractImage.search_patient_data(search_term)
+            return tools.JsonResp(extracted_data, 200)
+        except:
+            return tools.JsonResp({ "message": "Failed to search patient data" }, 500)
+    def patient_data(self):
+        try:
+            # get all the patient data from the database
+            patient_data = app.db.medical_records.find()
+            patient_data = list(patient_data)
+
+            return tools.JsonResp({"data" : patient_data, "count": len(patient_data)}, 200)
+        except:
+            return tools.JsonResp({"message": "Failed to load the data"},500)
     
