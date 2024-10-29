@@ -91,7 +91,7 @@ class User:
     
     return resp
   
-  def logout(self):
+  def   logout(self):
     try:
       tokenData = jwt.decode(request.headers.get("AccessToken"), app.config["SECRET_KEY"])
       app.db.users.update({ "id": tokenData["user_id"] }, { '$unset': { "refresh_token": "" } })

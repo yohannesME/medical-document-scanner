@@ -3,6 +3,7 @@ import base64
 from PIL import Image
 import openai
 import json
+from bson.objectid import ObjectId
 
 
 # Function to optimize the image before processing
@@ -101,3 +102,8 @@ def extract_medical_record_data(base64_image):
     extracted_data = response.choices[0].message.content
     return extracted_data
 
+
+def get_patient_data(patient_id):
+    data = app.db.medical_records.find_one({"_id": ObjectId(patient_id)})
+    return data
+    

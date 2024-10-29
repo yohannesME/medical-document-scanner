@@ -15,3 +15,8 @@ def upload_image():
 @token_required
 def extract_data_api():
 	return ExtractImage().extract_data_api()
+
+@extract_blueprint.route("/get_patient_data/<patient_id>", methods=["GET"])
+@token_required
+def get_patient_data(patient_id):
+	return ExtractImage().get_patient_data(patient_id)
