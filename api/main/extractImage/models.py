@@ -4,6 +4,7 @@ from main import extractImage
 from main import tools
 import json
 from jose import jwt
+from bson.objectid import ObjectId
 
 class ExtractImage:
     def get_user_from_token(self):
@@ -71,11 +72,13 @@ class ExtractImage:
                 try:
                     extracted_data = extractImage.extract_medical_record_data(base64_image)
                     user = self.get_user_from_token()
-                    extractImage.store_image_data_db(extracted_data, user)
+                    medical_record_id = extractImage.store_image_data_db(extracted_data, user)
+                    extracted_data = json.loads(extracted_data)
+                    extracted_data["_id"] = medical_record_id
+                    return tools.JsonResp({ "message": "Successfully extracted data", "data": extracted_data }, 200)
                 except Exception as e:
                     return tools.JsonResp({ "message": "Failed to extract data" }, 500)
 
-                return tools.JsonResp(json.loads(extracted_data), 200)
             else:
                 return tools.JsonResp({ "message": "Failed to optimize the image." }, 500)
         except Exception as e:
@@ -118,4 +121,12 @@ class ExtractImage:
             return tools.JsonResp({"data" : patient_data, "count": len(patient_data)}, 200)
         except:
             return tools.JsonResp({"message": "Failed to load the data"},500)
+    
+    def delete_patient_data(self, id):
+        try:
+            # delete the patient data from the database
+            app.db.medical_records.delete_one({"_id": ObjectId(id)})
+            return tools.JsonResp({ "message": "Patient data deleted" }, 200)
+        except:
+            return tools.JsonResp({ "message": "Failed to delete patient data" }, 500)
     

@@ -32,3 +32,9 @@ def search_patient_data():
 @token_required
 def patient_data():
 	return ExtractImage().patient_data()
+
+@extract_blueprint.route("/patient_data/<id>", methods=["DELETE"])
+@token_required
+def delete_patient_data(id):
+	return ExtractImage().delete_patient_data(id)
+

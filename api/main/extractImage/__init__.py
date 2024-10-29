@@ -37,8 +37,8 @@ def store_image_data_db(extracted_data, user):
     if "_id" in user:
         extracted_data["user_id"] = user["_id"]
 
-    app.db.medical_records.insert_one(extracted_data)
-    return extracted_data
+    response = app.db.medical_records.insert_one(extracted_data)
+    return response.inserted_id
 
 # Function to extract medical record data using OpenAI API
 def extract_medical_record_data(base64_image):
